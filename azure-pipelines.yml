@@ -67,8 +67,9 @@ stages:
                     targetType: 'inline'
                     script: |
                       # Modify deployment script based on the app type
+                      hostname
                       echo "Starting deployment script run"
-                      sudo cp '$(Pipeline.Workspace)/**/**.war' '/opt/tomcat/webapps'
+                      sudo cp '$(Pipeline.Workspace)/drop/target/helloworld.war' '/opt/tomcat/webapps'
                       sudo systemctl restart tomcat
                       # sudo java -jar '$(Pipeline.Workspace)/drop/**/target/*.jar'
               routeTraffic:
