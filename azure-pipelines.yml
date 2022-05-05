@@ -1,0 +1,51 @@
+trigger: 
+  - master
+
+variables: 
+  # Azure Resource Manager connection created during pipeline creation
+  azureSubscription: 'c621bc8e-c98e-48ad-b5de-07d7f63247b6'
+
+  # Web app name
+  webAppName: 'nls-training-java-maven'
+
+  # Environment name
+  environmentName: 'nls-training-java-maven'
+
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+stages:
+  - stage: Build
+    displayName: Build, Test and Publish
+    jobs:
+      - job: MavenPackageAndPublish
+        displayName: Maven Package and Publish Artifacts
+        pool:
+          vmImage: $(vmImageName)
+        
+        steps:
+          - task: Maven@3
+            inputs:
+              mavenPomFile: 'pom.xml'
+              mavenOptions: '-Xmx3072m'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.8'
+              jdkArchitectureOption: 'x64'
+              publishJUnitResults: true
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              goals: 'package'
+            
+  - stage: Deploy 
+    displayName: Deploy to VM
+    jobs:  
+    - deployment: VMDeploy
+      displayName: Deploy to VM
+      environment:
+        name:  vm-azure
+        resourceType: VirtualMachine
+        tags: web
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - script: echo my first deployment
