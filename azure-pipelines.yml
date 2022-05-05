@@ -5,12 +5,6 @@ variables:
   # Azure Resource Manager connection created during pipeline creation
   azureSubscription: 'c621bc8e-c98e-48ad-b5de-07d7f63247b6'
 
-  # Web app name
-  webAppName: 'nls-training-java-maven'
-
-  # Environment name
-  environmentName: 'nls-training-java-maven'
-
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
