@@ -52,7 +52,7 @@ stages:
     jobs: 
       - deployment: VMDeploy
         displayName: web
-        environment: vm-azure
+        environment: 'vm-azure'
         strategy:
             runOnce:
               preDeploy:
