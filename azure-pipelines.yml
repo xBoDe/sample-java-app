@@ -40,10 +40,7 @@ stages:
     jobs:  
     - deployment: VMDeploy
       displayName: Deploy to VM
-      environment:
-        name:  vm-azure
-        resourceType: VirtualMachine
-        tags: web
+      environment: vm-azure
       strategy:
         runOnce:
           deploy:
