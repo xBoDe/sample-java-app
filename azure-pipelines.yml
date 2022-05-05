@@ -34,15 +34,52 @@ stages:
               publishJUnitResults: true
               testResultsFiles: '**/surefire-reports/TEST-*.xml'
               goals: 'package'
+          
+          - task: CopyFiles@2
+            displayName: 'Copy Files to artifact staging directory'
+            inputs:
+                SourceFolder: '$(System.DefaultWorkingDirectory)'
+                Contents: '**/target/*.?(war|jar)'
+                TargetFolder: $(Build.ArtifactStagingDirectory)
+  
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: '$(Build.ArtifactStagingDirectory)'
+              artifactName: 'drop'
             
   - stage: Deploy 
     displayName: Deploy to VM
-    jobs:  
-    - deployment: VMDeploy
-      displayName: Deploy to VM
-      environment: vm-azure
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - script: echo my first deployment
+    jobs: 
+      - deployment: VMDeploy
+        displayName: web
+        environment: vm-azure
+        strategy:
+            runOnce:
+              preDeploy:
+                steps:
+                - download: current
+                  artifact: drop
+              deploy:
+                steps:
+                - task: Bash@3
+                  inputs:
+                    targetType: 'inline'
+                    script: |
+                      # Modify deployment script based on the app type
+                      echo "Starting deployment script run"
+                      sudo cp '$(Pipeline.Workspace)/**.war' '/opt/tomcat/webapps'
+                      sudo systemctl restart tomcat
+                      # sudo java -jar '$(Pipeline.Workspace)/drop/**/target/*.jar'
+              routeTraffic:
+                steps:
+                - script: echo routing traffic
+              postRouteTraffic:
+                steps:
+                - script: echo health check post-route traffic
+              on:
+                failure:
+                  steps:
+                  - script: echo Restore from backup! This is on failure
+                success:
+                  steps:
+                  - script: echo Notify! This is on success
