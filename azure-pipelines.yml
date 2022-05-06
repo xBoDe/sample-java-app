@@ -17,7 +17,7 @@ stages:
       - job: RunMavenPackage
         displayName: Maven Package, test and publish artifact
         pool:
-          vmImage: ${vmImageName}
+          vmImage: $(vmImageName)
 
         steps:
           - task: Maven@3
