@@ -5,7 +5,7 @@ pipeline {
         AWS_ACCESS_KEY_ID     = credentials('jenkins-aws-secret-key-id')
         AWS_SECRET_ACCESS_KEY = credentials('jenkins-aws-secret-access-key')
 
-        ARTIFACT_NAME = 'hello-world-${BUILD_ID}.war'
+        ARTIFACT_NAME = 'hello-world.war'
         AWS_S3_BUCKET = 'sample-java-test-bucket'
         AWS_EB_APP_NAME = 'sample-java-app'
         AWS_EB_ENVIRONMENT = 'Samplejavaapp-env'
