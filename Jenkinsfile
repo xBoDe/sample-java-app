@@ -4,6 +4,12 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID     = credentials('jenkins-aws-secret-key-id')
         AWS_SECRET_ACCESS_KEY = credentials('jenkins-aws-secret-access-key')
+
+        ARTIFACT_NAME = 'hello-world.jar'
+        AWS_S3_BUCKET = 'sample-java-test-bucket'
+        AWS_EB_APP_NAME = 'sample-java-app'
+        AWS_EB_ENVIRONMENT = 'Samplejavaapp-env'
+        AWS_EB_APP_VERSION = "${BUILD_ID}"
     }
 
     stages {
@@ -51,8 +57,14 @@ pipeline {
                     archiveArtifacts artifacts: '**/target/**.war', followSymlinks: false
 
                     sh 'aws configure set region us-east-1'
-                    sh 'aws s3 cp ./target/**.war s3://sample-java-test-bucket/hello-world.war'
+                    sh 'aws s3 cp ./target/**.war s3://$AWS_S3_BUCKET/hello-world.war'
                 }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'aws elasticbeanstalk update-environment --application-name $AWS_EB_APP_NAME --environment-name $AWS_EB_ENVIRONMENT --version-label $AWS_EB_APP_VERSION'
             }
         }
     }
